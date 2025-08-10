@@ -1,0 +1,2 @@
+# Sujal-s-store
+Glossary 
