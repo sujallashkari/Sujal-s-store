@@ -1,0 +1,257 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Billing – Sujal Provision Store</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: linear-gradient(to right, #fffaf0, #fceabb);
+      margin: 0;
+      padding: 20px;
+    }
+    .bill-container {
+      background: #fff;
+      padding: 25px;
+      max-width: 860px;
+      margin: auto;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .header div { width: 33%; }
+    .header-center {
+      font-size: 24px;
+      color: darkred;
+      text-align: center;
+    }
+    .store-name {
+      text-align: center;
+      font-size: 28px;
+      color: #2c3e50;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+    h2 {
+      margin-top: 30px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+    }
+    select, input.qty {
+      padding: 5px;
+    }
+    .section-total, .grand {
+      font-weight: bold;
+      text-align: right;
+      margin-top: 8px;
+    }
+    .note, .thank-you, .email-section, .footer {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+    .email-section input {
+      padding: 8px;
+      width: 60%;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .email-section button {
+      padding: 8px 15px;
+      background: #007bff;
+      border: none;
+      color: #fff;
+      border-radius: 4px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    .whatsapp a {
+      background: #25D366;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="bill-container">
+    <!-- Header -->
+    <div class="header">
+      <div>🙏 Shree Ganeshay Namah</div>
+      <div class="header-center">🕉️ Jai Hanuman Dada</div>
+      <div style="text-align:right;">🚩 Shree Sitaram</div>
+    </div>
+
+    <!-- Store Name -->
+    <div class="store-name">🛒 Sujal Provision Store</div>
+
+    <!-- Dal Section -->
+    <h2>Dal Section</h2>
+    <table>
+      <thead>
+        <tr><th>Dal</th><th>Price (₹/kg)</th><th>Quantity</th><th>Total Price</th></tr>
+      </thead>
+      <tbody id="dal-body"></tbody>
+    </table>
+    <div class="section-total">Dal Total: ₹<span id="dal-total">0</span></div>
+
+    <!-- Oil Section -->
+    <h2>Oil Section</h2>
+    <table>
+      <thead>
+        <tr><th>Oil</th><th>Price (₹/kg)</th><th>Quantity</th><th>Total Price</th></tr>
+      </thead>
+      <tbody id="oil-body"></tbody>
+    </table>
+    <div class="section-total">Oil Total: ₹<span id="oil-total">0</span></div>
+
+    <!-- Grand Total -->
+    <div class="grand">💰 Grand Total: ₹<span id="grand-total">0</span></div>
+
+    <!-- Note -->
+    <div class="note">Note: All types of grocery items are available here.</div>
+
+    <!-- Thank You -->
+    <div class="thank-you">🙏 Thank you for shopping with us!</div>
+
+    <!-- Email Input -->
+    <div class="email-section">
+      Enter your email to receive the bill:
+      <input type="email" id="email" placeholder="you@example.com">
+      <button onclick="sendBill()">📩 Send</button>
+    </div>
+
+    <!-- WhatsApp -->
+    <div class="whatsapp">
+      📱 <a href="https://wa.me/919726986675" target="_blank">Chat with us on WhatsApp</a>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="footer">
+      📞 Contact: <strong>9726986675</strong><br>
+      📨 Orders will be received on: <strong>sujallashkari904@gmail.com</strong>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    const dalItems = [
+      { name: 'Adad Dal', rate: 120 },
+      { name: 'Chana Dal', rate: 100 },
+      { name: 'Mag Chodi Dal', rate: 130 },
+      { name: 'Magfali Dal', rate: 120 },
+      { name: 'Masur Dal', rate: 120 },
+      { name: 'Mag', rate: 140 },
+      { name: 'Tuver Dal', rate: 150 }
+    ];
+
+    const oilItems = [
+      { name: 'Vimal Oil', rate: 150 },
+      { name: 'Sing Oil', rate: 160 }
+    ];
+
+    const qtyOptions = [0, 50, 100, 500, 750, 1000, 2000, 5000]; // in grams
+
+    function buildRows(items, tbodyId) {
+      items.forEach(item => {
+        const tr = document.createElement('tr');
+
+        const tdName = document.createElement('td'); tdName.textContent = item.name;
+        const tdRate = document.createElement('td'); tdRate.textContent = '₹' + item.rate;
+
+        const tdQty = document.createElement('td');
+        const select = document.createElement('select');
+
+        qtyOptions.forEach(g => {
+          const opt = document.createElement('option');
+          opt.value = g;
+          opt.textContent = g === 0 ? '-- Select --' : (g >= 1000 ? (g / 1000) + ' kg' : g + ' g');
+          select.appendChild(opt);
+        });
+
+        const customOpt = document.createElement('option');
+        customOpt.value = 'custom'; customOpt.textContent = 'Custom';
+        select.appendChild(customOpt);
+
+        tdQty.appendChild(select);
+
+        const tdPrice = document.createElement('td'); tdPrice.textContent = '₹0'; tdPrice.className = 'price';
+
+        select.addEventListener('change', () => {
+          if (select.value === 'custom') {
+            const grams = prompt('Enter custom grams (e.g., 1500 or 0.75):');
+            if (grams === null) {
+              select.value = 0;
+              tdPrice.textContent = '₹0';
+              updateTotals();
+              return;
+            }
+            const g = parseFloat(grams) * (grams.includes('.') ? 1000 : 1);
+            if (isNaN(g) || g <= 0) {
+              alert('Invalid input!');
+              select.value = 0;
+              tdPrice.textContent = '₹0';
+            } else {
+              updatePrice(item.rate, g, tdPrice);
+            }
+          } else {
+            const g = parseFloat(select.value);
+            updatePrice(item.rate, g, tdPrice);
+          }
+          updateTotals();
+        });
+
+        tr.append(tdName, tdRate, tdQty, tdPrice);
+        document.getElementById(tbodyId).appendChild(tr);
+      });
+    }
+
+    function updatePrice(rate, grams, cell) {
+      const price = (grams / 1000) * rate;
+      cell.textContent = '₹' + price.toFixed(2);
+    }
+
+    function sectionTotal(tbodyId) {
+      return [...document.querySelectorAll(`#${tbodyId} .price`)]
+        .reduce((sum, el) => sum + parseFloat(el.textContent.replace('₹', '')) || 0, 0);
+    }
+
+    function updateTotals() {
+      const dal = sectionTotal('dal-body');
+      const oil = sectionTotal('oil-body');
+      document.getElementById('dal-total').textContent = dal.toFixed(2);
+      document.getElementById('oil-total').textContent = oil.toFixed(2);
+      document.getElementById('grand-total').textContent = (dal + oil).toFixed(2);
+    }
+
+    function sendBill() {
+      const em = document.getElementById('email').value.trim();
+      if (em) alert('Bill will be sent to: ' + em + ' (this is a demo)');
+      else alert('Please enter a valid email address.');
+    }
+
+    buildRows(dalItems, 'dal-body');
+    buildRows(oilItems, 'oil-body');
+  </script>
+</body>
+</html>
